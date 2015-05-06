@@ -26,7 +26,17 @@ Access specific output parameters
 randr = Xrandr.new
 vga = randr.output(1)
 
-vga.connected? #=> true
+vga.connected #=> true
+vga.name #=> 'VGA1'
+vga.mode #=> '1920x1080'
+
+```
+
+```ruby
+randr = Xrandr.new
+vga = randr.output('VGA1')
+
+vga.connected #=> true
 vga.name #=> 'VGA1'
 vga.mode #=> '1920x1080'
 
@@ -34,33 +44,43 @@ vga.mode #=> '1920x1080'
 
 ### Configure
 
-You can set outputs parameters by index or by name:
 
 ```ruby
-randr = Xrandr.instance
+xrandr = Xrandr.new
 
-randr.configure(1).mode(1024, 768).position(1024, 0)
+# setting global options
+xrandr.configure(fb: '1920x1080', no_primary: true)
 
-randr.configure('VGA1').right_of('LVDS1')
 
-randr.configure(LVDS1').below(1)
+# setting per output options
+xrandr.configure('VGA1', auto: true)
+
+# also, can specify the output by index
+xrandr.configure('VGA2', mode: '1920x1080', right_of: 'VGA1')
+
 
 ```
 
 After all outputs are configured, call `#apply!` to execute the command.
 
-
 ```ruby
 
-randr.apply!
+xrandr.apply!
 
 ```
 
-For all available configuration parameter see [???]
+or call `#command`, to get the command line string that would be run
+```ruby
+
+xrandr.command #=> "xrandr --fb 1920x1080 --no_primary --output VGA1 --auto --output LVDS1 --mode 1920x1080 --pos 1921x0"
+
+```
+
+For all available configuration parameter see you can `man xrandr`
 
 ## Contributing
 
-Open an issue, lets talk!
+Open an issue, lets talk.
 
 ## License
 

@@ -2,6 +2,7 @@ require_relative 'helper'
 require_relative '../lib/xrandr'
 
 module Xrandr
+
   class Parser::ParseOutputTest < Minitest::Test
     def test_parse_outputs_returns_an_array_of_outputs
       o = [
@@ -116,20 +117,6 @@ module Xrandr
       assert_equal "1024x768", modes[0].resolution
       assert_equal "1920x1080", modes[1].resolution
       assert_equal "1366x768", modes[2].resolution
-    end
-  end
-
-  class OutputTest < Minitest::Test
-    def test_new_raises_if_no_name
-      assert_raises ArgumentError do
-        Output.new connected: false
-      end
-    end
-
-    def test_new_raises_if_no_connection_info
-      assert_raises ArgumentError do
-        Output.new name: 'o'
-      end
     end
   end
 end

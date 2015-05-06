@@ -1,22 +1,50 @@
-ENV['ENV'] ||= 'development'
-require 'byebug' if ENV['ENV'] == 'development'
-
 module Xrandr
   VERSION = '0.0.1'
 
-  class Command
-    def initialize(output)
-      @output = output
+  class Control
+    attr_reader :screens, :outputs, :command
+
+    def initialize(parser = Parser.new)
+      @screens, @outputs = * parser.parse
+      @command = 'xrandr'
+    end
+
+    def configure(output = nil, **options)
+      output = find_output(output) if output
+
+      command << " --output #{output.name}" if output
+      command << options.map do |option, value|
+        value = nil if value == true
+        " --#{option} #{value}".rstrip
+      end.join(' ')
+    end
+
+    def find_output(output)
+      if output.kind_of? Output
+        output
+      elsif output.kind_of? String
+        outputs.find {|o| o.name == output}
+      elsif output.kind_of? Integer
+        outputs[output]
+      else
+        raise ArgumentError, "Expecting a string, an integer or an Xrandr::Output instance"
+      end
+    end
+    alias_method :[], :find_output
+
+    def apply!
+      Kernel.system(command)
+      initialize
     end
   end
 
   class Parser
-    attr_reader :outputs
-    def initialize(data=`xrandr --query`)
-      @screens, @outputs = parse data
+    attr_reader :data
+    def initialize(data = `xrandr --query`)
+      @data = data
     end
 
-    def parse(data)
+    def parse
       screens_data, outputs_data = data.split("\n").group_by {|line| line.start_with?('Screen') }.values
 
       [ parse_screens(screens_data), parse_outputs(outputs_data) ]
@@ -37,7 +65,7 @@ module Xrandr
       data, *modes = data
 
       args = {
-              name:       /[a-zA-Z0-9]+/,
+              name:       /[a-zA-Z0-9\-\_]+/,
               connected:  /connected|disconnected/,
               primary:    /primary/,
               resolution: /\d+x\d+\+\d+\+\d+/,
@@ -84,8 +112,8 @@ module Xrandr
     attr_reader :name, :connected, :primary, :resolution, :position, :info, :dimensions, :modes
 
     def initialize(name:, connected:, primary: false, resolution: nil, position: nil, info: '', dimensions: '', modes: [])
-      raise ArgumentError "must provide a name for the output" unless name
-      raise ArgumentError "connected cant be nil" unless connected == true || connected == false
+      raise ArgumentError, "must provide a name for the output" unless name
+      raise ArgumentError, "connected cant be nil" unless connected == true || connected == false
       @name = name
       @connected = connected
       @primary = primary
