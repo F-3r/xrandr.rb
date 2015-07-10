@@ -118,5 +118,15 @@ module Xrandr
       assert_equal "1920x1080", modes[1].resolution
       assert_equal "1366x768", modes[2].resolution
     end
+
+    # some systems names the modes like 1920x1080i
+    def test_parse_modes_allows_i_suffix
+      session = Parser.new
+      modes = session.parse_modes ["   1024x768i      60.00 +", "   1920x1080i      60.00  ", "   1366x768i      60.07* "]
+
+      assert_equal "1024x768", modes[0].resolution
+      assert_equal "1920x1080", modes[1].resolution
+      assert_equal "1366x768", modes[2].resolution
+    end
   end
 end

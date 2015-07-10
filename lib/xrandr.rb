@@ -95,10 +95,11 @@ module Xrandr
     end
 
     def parse_mode(data)
-      matches = data.lstrip.match(/^(?<resolution>\d+x\d+) +(?<rate>[\d\.]+)(?<current>[\* ])(?<preferred>[\+ ])/)
+      matches = data.lstrip.match(/^(?<resolution>\d+x\d+i?) +(?<rate>[\d\.]+)(?<current>[\* ])(?<preferred>[\+ ]).*/)
 
+      resolution = matches[:resolution].gsub 'i', '' if matches[:resolution]
       args = {
-              resolution: matches[:resolution],
+              resolution: resolution,
               rate: matches[:rate],
               current: matches[:current] == '*',
               preferred: matches[:preferred] == '+',
