@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Fernando Martínez"]
   spec.email         = ["fernando.martinez@live.com.ar"]
   spec.summary       = %q{ A ruby wrapper for Xrandr }
-  spec.description   = ''
+  spec.description   = %q{ A ruby wrapper for Xrandr }
   spec.homepage      = "https://github.com/f-3r/xrandr"
   spec.license       = "MIT"
 
@@ -19,5 +19,5 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_development_dependency "bundler", "~> 1.7"
-  spec.add_development_dependency "minitest"
+  spec.add_development_dependency "minitest", "~> 5.7"
 end
