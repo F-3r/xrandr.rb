@@ -1,5 +1,5 @@
 module Xrandr
-  VERSION = '0.0.2'
+  VERSION = '0.0.3'
 
   class Control
     attr_reader :screens, :outputs, :command
