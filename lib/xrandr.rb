@@ -112,6 +112,10 @@ module Xrandr
   class Output
     attr_reader :name, :connected, :primary, :resolution, :position, :info, :dimensions, :modes
 
+    ON = 'on'.freeze
+    OFF = 'off'.freeze
+    DISCONNECTED = 'disconnected'.freeze
+
     def initialize(name:, connected:, primary: false, resolution: nil, position: nil, info: '', dimensions: '', modes: [])
       raise ArgumentError, "must provide a name for the output" unless name
       raise ArgumentError, "connected cant be nil" unless connected == true || connected == false
@@ -131,6 +135,11 @@ module Xrandr
 
     def preferred
       modes.detect(&:preferred)
+    end
+
+    def status
+      return DISCONNECTED unless connected
+      current ? ON : OFF
     end
   end
 
