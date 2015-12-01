@@ -1,5 +1,5 @@
 module Xrandr
-  VERSION = '0.0.3'
+  VERSION = '0.0.4'
 
   class Control
     attr_reader :screens, :outputs, :command
@@ -83,7 +83,8 @@ module Xrandr
       args[:primary]   = args[:primary] == 'primary'
 
       # Parse modes
-      args[:modes] = parse_modes(modes)
+
+      args[:modes] = args[:connected] ? parse_modes(modes) : []
 
       Output.new args
     end

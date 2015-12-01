@@ -75,6 +75,27 @@ module Xrandr
       assert_empty output.modes
       refute  output.primary
     end
+
+    def test_parse_output_recognizes_virtual_output_format
+      # when disconnecting a display that is actually being used, xrandr leaves a Virtual display with this kind of output
+      output = [
+                'VIRTUAL1 disconnected (normal left inverted right x axis y axis)',
+                '  1920x1080 (0x4b) 148.500MHz',
+                '        h: width  1920 start 2008 end 2052 total 2200 skew    0 clock  67.50KHz',
+                '        v: height 1080 start 1084 end 1089 total 1125           clock  60.00Hz'
+               ]
+
+      output = Parser.new.parse_output output
+
+      assert_equal 'VIRTUAL1', output.name
+      refute output.connected
+      assert_equal '(normal left inverted right x axis y axis)', output.info
+      assert_nil output.dimensions
+      assert_nil output.resolution
+      assert_nil output.position
+      assert_empty output.modes
+    end
+
   end
 
   class Parser::ParseModeTest < Minitest::Test
