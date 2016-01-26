@@ -16,29 +16,39 @@ Gives you the status of each of the outputs
 
 ```ruby
 
-Xrandr.new.outputs #=> [ <Xrandr::Output{ id: 1, name: 'LVDS1', connected: true, mode: '1920x1080' }>, <Xrandr::Output { id: 2, name: 'VGA1', connected: false }> ]
+Xrandr::Control.new.outputs #=> [#<Xrandr::Output:0x00557ed8ed80a8 @name="eDP1", @connected=true, @primary=true, @resolution="1920x1080", @position="0x0", @info="(normal left inverted right x axis y axis)", @dimensions="344mm x 193mm", @modes=[#<Xrandr::Mode:0x00557ed8ed9cc8 @resolution="1920x1080", @rate="60.0", @current=true, @preferred=true>, ... ]>, #<Xrandr::Output:0x00557ed8711f40 @name="DP1", @connected=false, @primary=false, @resolution=nil, @position=nil, @info="(normal left inverted right x axis y axis)", @dimensions=nil, @modes=[]>, ... ]
 
 ```
 
-Access specific output parameters
+Access specific output parameters by index
 
 ```ruby
-randr = Xrandr.new
-vga = randr.output(1)
+xrandr = Xrandr::Control.new
+
+vga = xrandr.find_output(1)
+# or
+vga = xrandr[1]
+
+vga.status #=> 'on'  # possible values are:  'on'`, 'off' or 'disconnected'
 
 vga.connected #=> true
 vga.name #=> 'VGA1'
-vga.mode #=> '1920x1080'
+vga.current # returns the current Xrandr::Mode for this display. nil if disconnected or off
 
 ```
 
+Access specific output parameters by name
+
 ```ruby
-randr = Xrandr.new
-vga = randr.output('VGA1')
+x = Xrandr::Control.new
+
+vga = xrandr.find_output('VGA1')
+# or
+vga = xrandr['VGA1']
 
 vga.connected #=> true
 vga.name #=> 'VGA1'
-vga.mode #=> '1920x1080'
+vga.current #=> '1920x1080'
 
 ```
 
@@ -46,7 +56,7 @@ vga.mode #=> '1920x1080'
 
 
 ```ruby
-xrandr = Xrandr.new
+xrandr = Xrandr::Control.new
 
 # setting global options
 xrandr.configure(fb: '1920x1080', no_primary: true)
@@ -80,7 +90,7 @@ For all available configuration parameter see you can `man xrandr`
 
 ## Contributing
 
-Open an issue, lets talk.
+Open an issue, a PR, or whatever you feel comfortable with.
 
 ## License
 
