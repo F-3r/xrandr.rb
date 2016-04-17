@@ -96,6 +96,23 @@ module Xrandr
       assert_empty output.modes
     end
 
+    def test_parses_rotation
+      session = Parser.new
+
+      assert_equal 'inverted', session.parse_output(['eDP1 connected primary 1920x1080+0+0 inverted (normal left inverted right x axis y axis) 344mm x 193mm']).rotation
+      assert_equal 'left', session.parse_output(['eDP1 connected primary 1080x1920+0+0 left (normal left inverted right x axis y axis) 344mm x 193mm']).rotation
+      assert_equal 'right', session.parse_output(['eDP1 connected primary 1080x1920+0+0 right (normal left inverted right x axis y axis) 344mm x 193mm']).rotation
+      assert_equal 'normal', session.parse_output(['eDP1 connected primary 1920x1080+0+0 (normal left inverted right x axis y axis) 344mm x 193mm']).rotation
+    end
+
+    def test_when_rotated_returns_original_resolution
+      session = Parser.new
+
+      assert_equal '1920x1080', session.parse_output(['eDP1 connected primary 1920x1080+0+0 (normal left inverted right x axis y axis) 344mm x 193mm']).resolution
+      assert_equal '1920x1080', session.parse_output(['eDP1 connected primary 1920x1080+0+0 inverted (normal left inverted right x axis y axis) 344mm x 193mm']).resolution
+      assert_equal '1920x1080', session.parse_output(['eDP1 connected primary 1080x1920+0+0 left (normal left inverted right x axis y axis) 344mm x 193mm']).resolution
+      assert_equal '1920x1080', session.parse_output(['eDP1 connected primary 1080x1920+0+0 right (normal left inverted right x axis y axis) 344mm x 193mm']).resolution
+    end
   end
 
   class Parser::ParseModeTest < Minitest::Test

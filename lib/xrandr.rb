@@ -69,6 +69,7 @@ module Xrandr
               connected:  /connected|disconnected/,
               primary:    /primary/,
               resolution: /\d+x\d+\+\d+\+\d+/,
+              rotation:   /(inverted|left|right) \(/,
               info:       /\([^\)]+\)/,
               dimensions: /[0-9+]+mm x [0-9]+mm/,
              }
@@ -78,7 +79,11 @@ module Xrandr
       # split resolution and position values split all values, coherce to integers, split the array in halfs, assign each half)
       args[:resolution], args[:position] = args[:resolution].split(/x|\+/).each_slice(2).map {|v| v.join('x') }  if args[:resolution]
 
+      # Xrandr swaps resolution when display is rotated left or right
+      args[:resolution] = args[:resolution].split('x').reverse!.join('x') if args[:rotation] == 'left' || args[:rotation] == 'right'
+
       # Coherce parameters
+      args[:rotation] = args[:rotation] ? args[:rotation].first : 'normal'
       args[:connected] = args[:connected] == 'connected'
       args[:primary]   = args[:primary] == 'primary'
 
@@ -111,13 +116,13 @@ module Xrandr
   end
 
   class Output
-    attr_reader :name, :connected, :primary, :resolution, :position, :info, :dimensions, :modes
+    attr_reader :name, :connected, :primary, :resolution, :position, :rotation, :info, :dimensions, :modes
 
     ON = 'on'.freeze
     OFF = 'off'.freeze
     DISCONNECTED = 'disconnected'.freeze
 
-    def initialize(name:, connected:, primary: false, resolution: nil, position: nil, info: '', dimensions: '', modes: [])
+    def initialize(name:, connected:, primary: false, resolution: nil, position: nil, rotation: '', info: '', dimensions: '', modes: [])
       raise ArgumentError, "must provide a name for the output" unless name
       raise ArgumentError, "connected cant be nil" unless connected == true || connected == false
       @name = name
@@ -126,6 +131,7 @@ module Xrandr
       @resolution = resolution
       @position = position
       @info = info
+      @rotation = rotation
       @dimensions = dimensions
       @modes = modes
     end
