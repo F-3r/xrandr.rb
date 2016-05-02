@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["fernando.martinez@live.com.ar"]
   spec.summary       = %q{ A ruby wrapper for Xrandr }
   spec.description   = %q{ A ruby wrapper for Xrandr }
-  spec.homepage      = "https://github.com/f-3r/xrandr"
+  spec.homepage      = "https://github.com/F-3r/xrandr.rb"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0")
