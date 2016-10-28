@@ -1,5 +1,5 @@
 module Xrandr
-  VERSION = '0.0.5'
+  VERSION = '0.0.6'
 
   class Control
     attr_reader :screens, :outputs, :command
@@ -36,6 +36,16 @@ module Xrandr
       Kernel.system(command)
       initialize
     end
+
+    def connected_outputs
+      outputs.select { |output| output.connected }
+    end
+
+    def disconnected_outputs
+      outputs.reject { |output| output.connected }
+    end
+
+
   end
 
   class Parser
@@ -154,10 +164,39 @@ module Xrandr
     attr_reader :resolution, :rate, :current, :preferred
 
     def initialize(args={})
-      @resolution = args.fetch :resolution
+      @resolution = Resolution.new(args.fetch :resolution)
       @rate = args.fetch :rate
       @current = args.fetch :current
       @preferred = args.fetch :preferred
     end
   end
+
+  ##
+  # This class converts a resolution string of the form "1234x5678" (arbitrary
+  # digit count) into a form with discrete numeric x and y components.
+  # It implements the comparable interface on the basis of total pixel count.
+  class Resolution
+    include Comparable
+    MATCHER = /(?<x>\d+)x(?<y>\d+)/
+    attr_accessor :x
+    attr_accessor :y
+    def initialize(res_string)
+      resolution_tokens = MATCHER.match(res_string)
+      return unless resolution_tokens
+      @x = resolution_tokens[:x].to_i
+      @y = resolution_tokens[:y].to_i
+    end
+
+    def <=>(other)
+      # compare based on pixel count
+      @x * @y <=> other.x * other.y
+    end
+
+    def to_s
+      "#{@x}x#{@y}"
+    end
+  end
+
 end
+
+require 'xrandr/configurator'
