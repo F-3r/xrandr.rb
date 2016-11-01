@@ -198,5 +198,3 @@ module Xrandr
   end
 
 end
-
-require 'xrandr/configurator'
