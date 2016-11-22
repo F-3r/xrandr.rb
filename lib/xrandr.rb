@@ -45,7 +45,6 @@ module Xrandr
       outputs.reject { |output| output.connected }
     end
 
-
   end
 
   class Parser
@@ -177,23 +176,26 @@ module Xrandr
   # It implements the comparable interface on the basis of total pixel count.
   class Resolution
     include Comparable
-    MATCHER = /(?<x>\d+)x(?<y>\d+)/
-    attr_accessor :x
-    attr_accessor :y
+    MATCHER = /(?<width>\d+)x(?<height>\d+)/
+    attr_reader :width, :height
     def initialize(res_string)
       resolution_tokens = MATCHER.match(res_string)
       return unless resolution_tokens
-      @x = resolution_tokens[:x].to_i
-      @y = resolution_tokens[:y].to_i
+      @width = resolution_tokens[:width].to_i
+      @height = resolution_tokens[:height].to_i
+    end
+
+    def abs
+      @width * @height
     end
 
     def <=>(other)
-      # compare based on pixel count
-      @x * @y <=> other.x * other.y
+      # compare based on total pixel count
+      abs <=> other.abs
     end
 
     def to_s
-      "#{@x}x#{@y}"
+      "#{@width}x#{@height}"
     end
   end
 
