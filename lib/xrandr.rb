@@ -1,5 +1,5 @@
 module Xrandr
-  VERSION = '0.0.6'
+  VERSION = '0.0.7'
 
   class Control
     attr_reader :screens, :outputs, :command
@@ -104,23 +104,15 @@ module Xrandr
     end
 
     def parse_modes(modes)
-      modes.map do |data|
-        parse_mode data
+      modes.map! do |m|
+        begin
+          Mode.from_s(m)
+        rescue => e
+          puts e
+          nil
+        end
       end
-    end
-
-    def parse_mode(data)
-      matches = data.lstrip.match(/^(?<resolution>\d+x\d+i?) +(?<rate>[\d\.]+)(?<current>[\* ])(?<preferred>[\+ ]).*/)
-
-      resolution = matches[:resolution].gsub 'i', '' if matches[:resolution]
-      args = {
-              resolution: resolution,
-              rate: matches[:rate],
-              current: matches[:current] == '*',
-              preferred: matches[:preferred] == '+',
-             }
-
-      Mode.new args
+      modes.compact
     end
   end
 
@@ -161,6 +153,21 @@ module Xrandr
 
   class Mode
     attr_reader :resolution, :rate, :current, :preferred
+    MATCHER = /^\s*(?<resolution>\d+x\d+i?) +(?<rate>[\d\.]+)(?<current>[\* ])(?<preferred>[\+ ]).*/
+
+    def self.from_s(mode_string)
+      matches = mode_string.match(MATCHER)
+      raise "Failed to parse mode #{data}" if matches.nil?
+      resolution = matches[:resolution].gsub 'i', '' if matches[:resolution]
+      args = {
+        resolution: resolution,
+        rate: matches[:rate],
+        current: matches[:current] == '*',
+        preferred: matches[:preferred] == '+',
+      }
+
+      Mode.new args
+    end
 
     def initialize(args={})
       @resolution = Resolution.new(args.fetch :resolution)
