@@ -1,5 +1,5 @@
 module Xrandr
-  VERSION = '0.0.6'
+  VERSION = '0.0.7'
 
   class Control
     attr_reader :screens, :outputs, :command
@@ -100,7 +100,7 @@ module Xrandr
 
       args[:modes] = args[:connected] ? parse_modes(modes) : []
 
-      Output.new args
+      Output.new(**args)
     end
 
     def parse_modes(modes)
@@ -120,7 +120,7 @@ module Xrandr
               preferred: matches[:preferred] == '+',
              }
 
-      Mode.new args
+      Mode.new(**args)
     end
   end
 
